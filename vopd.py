@@ -98,11 +98,11 @@ if __name__ == '__main__':
                         default='keywords.csv')
     parser.add_argument('--normalizefile', help='normalize terms file (default = normalize_terms.csv)', type=argparse.FileType('r'),
                         default='normalize_terms.csv')
-    parser.add_argument('--mode', help='Mode: pdf or tweets or email', type=str,
+    parser.add_argument('--mode', help='Mode: pdf or tweets or bdtweets or email', type=str,
                         default='pdf')
     parser.add_argument("--verbose", help="increase output verbosity",
                         action="store_true")
-    parser.add_argument('transcript', help='filepath to transcript pdf or directory, or to SFM extract Excel file')
+    parser.add_argument('transcript', help='filepath to transcript pdf or directory, to SFM extract Excel file, or to BrightData extract CSV')
 
     args = parser.parse_args()
 
