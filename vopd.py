@@ -1,8 +1,10 @@
+# fmt: off
+
 import argparse
 import config
 import csv
 import datetime
-from document import PDFTranscriptDocumentSet, SFMExtractDocumentSet, EmailExtractDocumentSet
+from document import PDFTranscriptDocumentSet, SFMExtractDocumentSet, EmailExtractDocumentSet, BDTwitterDocumentSet
 import os
 import pytz
 import re
@@ -149,6 +151,18 @@ if __name__ == '__main__':
                    'text',
                    'Code (N, or 1-6)', 'A/B', 'Foreign/Domestic', 'Notes', 'Feedback']
         extractfilename = 'extracts-tweets.csv'
+    if args.mode == 'bdtweets':
+        if args.verbose:
+            print("Getting bdtweetdocset...")
+        bdtweetdocset = BDTwitterDocumentSet(args.transcript)
+        if args.verbose:
+            print("                   ...complete")
+        headers = ['extract_date', 'tweet_id', 'created_date', 'user_screen_name', 'tweet_url',
+                   'subject', 'subject_code', 'keyword', 'keyword_code', 'keyword_id',
+                   'Code (N, or 1-6)', 'A/B', 'Foreign/Domestic', 'Notes', 'Feedback',
+                   'text',
+                   'Code (N, or 1-6)', 'A/B', 'Foreign/Domestic', 'Notes', 'Feedback']
+        extractfilename = 'bd-extracts-tweets.csv'
     if args.mode == 'email':
         if args.verbose:
             print("Getting emaildocset...")
@@ -254,6 +268,42 @@ if __name__ == '__main__':
                                           keyword_id[m_keyword],
                                           '', '', '', '', '',
                                           extract])
+    
+    if args.mode == 'bdtweets':
+        with open('bd-extracts-tweets.csv', file_mode) as extract_file:
+            extract_csv = csv.writer(extract_file)
+            if not append_extracts:
+                extract_csv.writerow(headers)
+                
+            for tweet in bdtweetdocset:
+                if args.verbose:
+                    print('Checking a tweet')
+                tweet_info = tweet.metadata
+                m_transcript_text = str(tweet.text)
+                m_transcript_words = tokenize(m_transcript_text)
+                for m_subject, m_subject_pos, m_keyword, m_keyword_pos in process_document_iter(m_transcript_words, window_size=args.window):
+                    if args.verbose:
+                        print('     Found a match')
+                    extract_date = datetime.datetime.now(tz=pytz.timezone(TIME_ZONE)).strftime("%m/%d/%y %H:%M:%S %Z%z")
+                    
+                    extract = ' '.join(
+                        context(m_transcript_words, min(m_subject_pos, m_keyword_pos),
+                                max(m_subject_pos, m_keyword_pos),
+                                context_size=args.context))
+                    extract_csv.writerow([extract_date,
+                                          tweet_info['id'],
+                                          tweet_info['date_posted'],
+                                          tweet_info['user_screen_name'],
+                                          tweet_info['url'],
+                                          m_subject,
+                                          subject_map[m_subject],
+                                          m_keyword,
+                                          keyword_map[m_keyword],
+                                          keyword_id[m_keyword],
+                                          '', '', '', '', '',
+                                          extract])
+                print(tweet_info)
+                
 
     if args.mode == 'email':
         with open('extracts-email.csv', file_mode) as extract_file:
@@ -299,4 +349,3 @@ if __name__ == '__main__':
                                           keyword_id[m_keyword],
                                           '', '', '', '', '',
                                           extract])
-
