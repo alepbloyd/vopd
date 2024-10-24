@@ -178,16 +178,11 @@ def collect_tweets(start_date, end_date, handles_list, output_sheet):
     snapshot_id = trigger_response["snapshot_id"]
     print(f"Snapshot ID: {snapshot_id}")
     results = get_snapshot_results(snapshot_id)
+    time.sleep(10) # I don't know why this is necessary, but otherwise it doesn't return the tweets despite getting a 200 response
+    tweets = get_snapshot_results(snapshot_id)
     print(f"Snapshot retrieved, writing to {output_sheet}")
-    write_results_to_csv(results, output_sheet)
+    write_results_to_csv(tweets, output_sheet)
     print(f"Complete")
-
-# collect_tweets(
-#     start_date="2024-10-15",
-#     end_date="2024-10-22",
-#     handles_list=["SenatorBaldwin", "SenSherrodBrown"],
-#     output_sheet="testing123.csv",
-# )
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
