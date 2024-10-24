@@ -1,3 +1,4 @@
+import argparse
 import requests
 import json
 import pandas as pd
@@ -187,3 +188,30 @@ def collect_tweets(start_date, end_date, handles_list, output_sheet):
 #     handles_list=["SenatorBaldwin", "SenSherrodBrown"],
 #     output_sheet="testing123.csv",
 # )
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--handlescsv', help='csv file containing twitter handles to collect tweets from (default = handles.csv)',
+                        type=str,
+                        default='handles.csv')
+    parser.add_argument('--start-date', help='start date of collection in YYYY-MM-DD format (default is yesterday)',
+                        type=str,
+                        default=yesterdays_date())
+    parser.add_argument('--end-date', help='end date of collection in YYYY-MM-DD format (default is today)',
+                        type=str,
+                        default=todays_date())
+    parser.add_argument('--outputfile', help='filepath for results csv (default = bd-tweets.csv)',
+                        default='bd-tweets.csv')
+    args = parser.parse_args()
+    
+    handles_path = args.handlescsv
+    output_path = args.outputfile
+    
+    with open(handles_path, 'r') as file:
+        handles = clean_handle_list(file.read().split('\n'))
+        
+    collect_tweets(start_date=args.start_date,
+                   end_date=args.end_date,
+                   handles_list=handles,
+                   output_sheet=output_path
+                   )
