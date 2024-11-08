@@ -157,11 +157,10 @@ if __name__ == '__main__':
         bdtweetdocset = BDTwitterDocumentSet(args.transcript)
         if args.verbose:
             print("                   ...complete")
-        headers = ['extract_date', 'tweet_id', 'created_date', 'user_screen_name', 'tweet_url',
-                   'subject', 'subject_code', 'keyword', 'keyword_code', 'keyword_id',
-                   'Code (N, or 1-6)', 'A/B', 'Foreign/Domestic', 'Notes', 'Feedback',
-                   'text',
-                   'Code (N, or 1-6)', 'A/B', 'Foreign/Domestic', 'Notes', 'Feedback']
+        headers = ['Date', 'Handle', 'Name', 'Party', 'House/Senate', 'Incumbent/Challenger', 'Tweet',
+                   'Sentiment Word', 'Group Term', 'Sentiment Tone (N/P)', 'Group Type (C, I, F, O, P)',
+                   'Coding Decision (see code book)'
+                   ]
         extractfilename = 'bd-extracts-tweets.csv'
     if args.mode == 'email':
         if args.verbose:
@@ -290,19 +289,20 @@ if __name__ == '__main__':
                         context(m_transcript_words, min(m_subject_pos, m_keyword_pos),
                                 max(m_subject_pos, m_keyword_pos),
                                 context_size=args.context))
-                    extract_csv.writerow([extract_date,
-                                          tweet_info['id'],
-                                          tweet_info['date_posted'],
-                                          tweet_info['user_screen_name'],
-                                          tweet_info['url'],
-                                          m_subject,
-                                          subject_map[m_subject],
-                                          m_keyword,
-                                          keyword_map[m_keyword],
-                                          keyword_id[m_keyword],
-                                          '', '', '', '', '',
-                                          extract])
-                print(tweet_info)
+                    extract_csv.writerow([tweet_info['timestamp'], # Date
+                                          tweet_info['user_screen_name'], # handle
+                                          tweet_info['name'], # name
+                                          "", # party - fill in later via vlookup
+                                          "", # house/senate - fill in later via vlookup
+                                          "", # incumbent/challenger - fill in later via vlookup
+                                          tweet_info['description'], # tweet
+                                          m_keyword, # sentiment word
+                                          m_subject, # group name
+                                          keyword_map[m_keyword], # sentiment tone, N or P
+                                          subject_map[m_subject][0],
+                                          "", # coding decision - leave blank
+                                          extract
+                    ])
                 
 
     if args.mode == 'email':
