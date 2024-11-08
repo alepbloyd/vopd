@@ -43,22 +43,13 @@ where:
 * Sender
 * Message
 
-## Generating BrightData twitter data sets
+## Generating BrightData twitter data sets via AWS Lambda function
 
 Requires an API key and credits for [BrightData web data APIs](https://docs.brightdata.com/scraping-automation/web-data-apis/web-scraper-api/overview).
 
-Make a copy of `.env.example`, rename it to `.env`, and replace the placeholder values with your API key and dataset ID. 
+Code in `brightdata-aws-lambda.py` can be used as an AWS Lambda function to trigger a collection of tweets using the Brightdata API. The resulting tweets data set is deposited into the S3 bucket configured in environment variables. This can be configured to trigger at an interval of your choice via AWS Cloudwatch settings. 
 
-usage: `python brightdata-service.py [-h] [--start-date STARTDATE] [--end-date ENDDATE] [--outputfile OUTPUTFILE]`
-
-```
-optional argument:
-  -h, --help                show this help message and exit
-  --start-date STARTDATE    starting date for tweet collection in YYYY-MM-DD format (default is yesterday)
-  --end-date ENDDATE        ending date for tweet collection in YYYY-MM-DD format (default is today)
-  --outputfile OUTPUTFILE   filepath for results csv (default = bd-tweets.csv)
-```
-
+You can also trigger a collection manually by running the `brightdata-aws-lambda.py` script, and inserting start and end dates in `YYYY-MM-DD` in the `collect_tweets` function.
 
 ## Output files
 
@@ -76,5 +67,4 @@ The `recycle_keywords.py` utility takes:
 - A normalize_terms file (default `normalize_terms.csv`)
 
 It scans through the coding file, looking for keyword severity scores assigned by the human coder, as well as looking for new keywords added by the human coder.  It then updates the scores of existing keywords (using the mode of human-assigned severity scores), and adds new keywords, to the keywords file.
-
 
